@@ -1,0 +1,85 @@
+// Returns a random DNA base
+const returnRandBase = () => {
+  const dnaBases = ['A', 'T', 'C', 'G']
+  return dnaBases[Math.floor(Math.random() * 4)] 
+}
+
+// Returns a random single stand of DNA containing 15 bases
+const mockUpStrand = () => {
+  const newStrand = []
+  for (let i = 0; i < 15; i++) {
+    newStrand.push(returnRandBase())
+  }
+  return newStrand
+}
+
+//Step 3: factory function:
+const pAequorFactory = (num, dnaArr) => {
+  dnaArr = mockUpStrand();
+  return {
+    specimenNum: num,
+    dna: dnaArr,
+
+    mutate() {
+      let i = Math.floor(Math.random() * this.dna.length);
+      const randomDnaBase = this.dna[i];
+      const randBase = returnRandBase();
+      if(randomDnaBase !== randBase){
+        this.dna.splice(i, 1, randBase);
+        return this.dna;
+      } else {
+        return this.mutate();
+      }
+    },
+
+    compareDNA(pObj) {
+      let compTally = 0;
+      for(let i = 0; i < this.dna.length; i++){
+        if(this.dna[i] === pObj.dna[i]){
+          compTally += 1;
+        }
+      }
+      const compPercent = (compTally / this.dna.length) * 100;
+      console.log(`pAequor ${this.specimenNum} and pAequor ${pObj.specimenNum} have ${compPercent}% DNA in common.`)
+    },
+
+    willLikelySurvive()  {
+      let cgBases = this.dna.filter(base => base === 'C' || base === 'G');
+      let cgBasesTotal = (cgBases.length / this.dna.length);
+      if( cgBasesTotal > .59) {
+        return true;
+      } else {
+        return false;
+      }
+    },
+    
+    complementStrand() {
+      let compStrand = [];
+      for(let j = 0; j < this.dna.length; j++){
+        switch(this.dna[j]){
+          case 'A':
+            compStrand.push('T');
+            break;
+          case 'T':
+            compStrand.push('A');
+            break;
+          case 'C':
+            compStrand.push('G');
+            break;
+          case 'G':
+            compStrand.push('C');
+            break;
+          default:
+            return 'Could not create complementary DNA.'
+        }
+       };
+       return compStrand;
+    }
+  }
+};
+
+const samples = [];
+for(let j = 1; j < 31; j++){
+  samples.push(pAequorFactory(j));
+}
+
